@@ -70,8 +70,6 @@
             const [expandedModule, setExpandedModule] = React.useState(null);
             const [moduleView, setModuleView] = React.useState('grid');
             const [chatMessages, setChatMessages] = React.useState([
-            const [cashFlowData, setCashFlowData] = React.useState(null);
-            const [loading, setLoading] = React.useState(true);
                 {
                     role: 'assistant',
                     content: "Hi! I'm MoMo, your AI operations advisor. I can help you understand your business metrics, predict what capabilities you'll need, and answer questions about your growth trajectory.",
@@ -80,6 +78,8 @@
             ]);
             const [chatInput, setChatInput] = React.useState('');
             const [isTyping, setIsTyping] = React.useState(false);
+            const [cashFlowData, setCashFlowData] = React.useState(null);
+            const [loading, setLoading] = React.useState(true);
 
             React.useEffect(() => {
              fetch(`${API_URL}?email=${USER_EMAIL}`)
