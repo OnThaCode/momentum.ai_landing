@@ -811,7 +811,13 @@
                                     {/* Health Score - Overview only shows preview */}
                                     <div className="mb-8">
                                         <h2 className="text-2xl font-bold mb-4">Dashboard Overview</h2>
+                                        {cashFlowData?.forecast?.alert_level === 'critical' && (<div className="mb-6 p-4 bg-red-900/20 border border-red-500 rounded-lg">
+                                        <h3 className="text-red-400 font-bold mb-2">🚨 CRITICAL: Cash Crisis Detected</h3>
+                                        <p className="text-sm text-gray-300">Your business is predicted to run out of cash soon. Check the forecast details immediately.</p>
+                                    </div>
+                                  )}
                                         <p className="text-gray-400 mb-6">Your business health and top modules at a glance</p>
+                                        <p className="text-xl text-white mb-4">{cashFlowData ? cashFlowData.user_email.split('@')[0] + "'s Business" : 'Loading...'}</p>
                                         
                                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                             <div className="lg:col-span-2 rounded-2xl bg-gradient-to-br from-purple-900/20 via-black to-fuchsia-900/20 border border-purple-500/30 p-8">
@@ -835,9 +841,10 @@
                                                     <div className="flex-1">
                                                         <div className="flex items-center gap-2 mb-4">
                                                             <span className="w-5 h-5 text-green-400 inline-block"><TrendingUp /></span>
-                                                            <span className="text-green-400 font-bold">{businessData.trend} this week</span>
+                                                            <span className={`font-bold ${parseFloat(cashFlowData?.last_30_days.net || 0) < 0 ? 'text-red-400' : 'text-green-400'}`}>
+                                                            {cashFlowData ? cashFlowData.last_30_days.net : '0'} (30 days)</span>
                                                         </div>
-                                                        <p className="text-sm text-gray-400">Revenue: ${businessData.monthlyRevenue.toLocaleString()}/mo</p>
+                                                        <p className="text-sm text-gray-400 mb-1">Daily Burn: ${cashFlowData ? cashFlowData.last_30_days.avg_daily_burn : '0'}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -874,6 +881,25 @@
                                             {businessData.modules.slice(0, 3).map(module => renderModuleCard(module))}
                                         </div>
                                     </div>
+
+                                    <div className="mb-8">
+    <h2 className="text-2xl font-bold text-white mb-6">Recent Transactions</h2>
+    {cashFlowData && cashFlowData.recent_transactions ? (
+        <div className="space-y-3">
+            {cashFlowData.recent_transactions.map((txn, idx) => (
+                <div key={idx} className="rounded-xl bg-gradient-to-br from-gray-900 to-black border border-purple-800/30 p-4 flex justify-between items-center">
+                    <div>
+                        <p className="text-white font-medium">{txn.merchant}</p>
+                        <p className="text-xs text-gray-400">{txn.category} • {txn.date}</p>
+                    </div>
+                    <p className={`font-bold ${txn.type === 'inflow' ? 'text-green-400' : 'text-red-400'}`}>
+                        {txn.type === 'inflow' ? '+' : '-'}${txn.amount}
+                    </p>
+                </div>
+            ))}
+        </div>
+    ) : <p className="text-gray-400">No transactions available</p>}
+</div>
 
                                     {/* Recent Insights */}
                                     <div>
