@@ -61,6 +61,8 @@
         const Circle = () => <i data-lucide="circle"></i>;
 
         const MomentumDashboard = () => {
+            const API_URL = 'https://relentlessdev.app.n8n.cloud/webhook/cash-flow-data';
+            const USER_EMAIL = 'test@momentum.ai';
             const [sidebarOpen, setSidebarOpen] = React.useState(true);
             const [chatOpen, setChatOpen] = React.useState(false);
             const [activeSection, setActiveSection] = React.useState('overview');
@@ -68,6 +70,8 @@
             const [expandedModule, setExpandedModule] = React.useState(null);
             const [moduleView, setModuleView] = React.useState('grid');
             const [chatMessages, setChatMessages] = React.useState([
+            const [cashFlowData, setCashFlowData] = React.useState(null);
+            const [loading, setLoading] = React.useState(true);
                 {
                     role: 'assistant',
                     content: "Hi! I'm MoMo, your AI operations advisor. I can help you understand your business metrics, predict what capabilities you'll need, and answer questions about your growth trajectory.",
@@ -78,9 +82,20 @@
             const [isTyping, setIsTyping] = React.useState(false);
 
             React.useEffect(() => {
-                const timer = setTimeout(() => setHealthScore(78), 100);
-                return () => clearTimeout(timer);
-            }, []);
+             fetch(`${API_URL}?email=${USER_EMAIL}`)
+              .then(res => res.json())
+              .then(data => {
+                setCashFlowData(data);
+                const score = data.forecast?.alert_level === 'critical' ? 35 : 
+                             data.forecast?.alert_level === 'warning' ? 65 : 85;
+                setHealthScore(score);
+                setLoading(false);
+        })
+        .catch(err => {
+            console.error('Failed to load:', err);
+            setLoading(false);
+        });
+}, []);
 
             // Render Lucide icons after component mounts
             React.useEffect(() => {
@@ -88,7 +103,7 @@
             });
 
             const businessData = {
-                businessName: "Your Business",
+                businessName: cashFlowData ? cashFlowData.user_email.split('@')[0] + "'s Business" : "Your Business",
                 monthlyRevenue: 12400,
                 healthScore: 78,
                 trend: "+12",
